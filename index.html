@@ -17,25 +17,28 @@
       #radiusInput::after {
         content: attr(value);
         position: absolute;
-        bottom: -2rem;
+        top: -1.2rem;
         font-size: 1.2rem;
         background-color: blue;
         width: 2.5rem;
         text-align: center;
-        color: #777;
+        color: white;
       }
     </style>
   </head>
   <body>
     <input type="file" id="fileInput" accept="image/*" />
+    <button id="pasteBtn">Ctrl + V</button>
     <img hidden />
     <div id="canvasWrapper">
-      <canvas width="1257" height="737" />
+      <canvas />
     </div>
     <div>
       <input type="range" id="radiusInput" min="1" max="500" value="100" />
       <button id="drawCirclesBtn">Draw Circles</button>
       <button id="clearBtn">Clear</button>
+      <button id="equidistanceBtn">Equidistance</button>
+      <span id="coords"></span>
     </div>
     <ul id="pointsUl"></ul>
     <script src="script.js"></script>

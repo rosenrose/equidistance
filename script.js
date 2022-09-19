@@ -11,7 +11,8 @@ const equidistanceBtn = document.querySelector("#equidistanceBtn");
 const coords = document.querySelector("#coords");
 let [mainPoints, subPoints] = [[], []];
 let radius = 0;
-const distanceBetweenPoints = (p1, p2) => Math.sqrt((p1.x - p2.x) ** 2 + (p1.y - p2.y) ** 2);
+const distanceOfPoints = (p1, p2) => Math.sqrt((p1.x - p2.x) ** 2 + (p1.y - p2.y) ** 2);
+const sum = (items) => items.reduce((a, b) => a + b);
 
 fileInput.addEventListener("change", (event) => newImage(event.target.files[0]));
 
@@ -122,39 +123,28 @@ equidistanceBtn.addEventListener("click", () => {
     return;
   }
 
-  let smallest = Infinity;
-  let temp = [];
+  const calculated = [];
 
   for (let x = 0; x < canvas.width; x++) {
     for (let y = 0; y < canvas.height; y++) {
-      if (mainPoints.find((p) => p.x === x && p.y === y)) {
-        continue;
-      }
+      const distances = mainPoints.map((point) => distanceOfPoints(point, { x, y }));
 
-      const distances = mainPoints.map((point) => distanceBetweenPoints(point, { x, y }));
+      const distSum = sum(distances);
+      const average = distSum / distances.length;
+      const deviation = Math.sqrt(sum(distances.map((dist) => Math.abs(dist - average) ** 2)));
 
-      // if (distances.slice(1).some((d) => Math.abs(d - distances[0]) > 0.1)) {
-      //   continue;
-      // }
-
-      const sum = distances.reduce((a, b) => a + b);
-      const average = sum / distances.length;
-      const deviation = Math.sqrt(
-        distances.map((dist) => Math.abs(dist - average) ** 2).reduce((a, b) => a + b)
-      );
-
-      if (smallest >= sum) {
-        smallest = sum;
-        temp.push([smallest, deviation, x, y]);
-      }
+      calculated.push({ x, y, distSum, deviation });
     }
   }
 
-  leastDeviation = Math.min(...temp.map((t) => t[1]));
-  equiPoints = temp.filter((t) => t[1] === leastDeviation);
-  // console.log(leastDeviation, equiPoints);
-  equiPoints.forEach((p) => {
-    subPoints.push({ x: p[2], y: p[3] });
-  });
+  const threshold = parseInt(canvas.width * canvas.height * 0.001);
+  const equiPoints = calculated
+    .sort((a, b) => a.deviation - b.deviation)
+    .slice(0, threshold)
+    .sort((a, b) => a.distSum - b.distSum);
+
+  // console.log(equiPoints);
+  // subPoints = [...subPoints, ...equiPoints];
+  subPoints.push(equiPoints[0]);
   clearBtn.click();
 });

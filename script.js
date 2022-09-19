@@ -6,6 +6,7 @@ const ctx = canvas.getContext("2d");
 const pointsUl = document.querySelector("#pointsUl");
 const radiusInput = document.querySelector("#radiusInput");
 const drawCirclesBtn = document.querySelector("#drawCirclesBtn");
+const eraseCirclesBtn = document.querySelector("#eraseCirclesBtn");
 const clearBtn = document.querySelector("#clearBtn");
 const equidistanceBtn = document.querySelector("#equidistanceBtn");
 const coords = document.querySelector("#coords");
@@ -14,10 +15,14 @@ let radius = 0;
 const distanceOfPoints = (p1, p2) => Math.sqrt((p1.x - p2.x) ** 2 + (p1.y - p2.y) ** 2);
 const sum = (items) => items.reduce((a, b) => a + b);
 
-fileInput.addEventListener("change", (event) => newImage(event.target.files[0]));
+fileInput.addEventListener("input", (event) => newImage(event.target.files[0]));
 
 function newImage(file) {
   map.src = URL.createObjectURL(file);
+  initPoints();
+}
+
+function initPoints() {
   [mainPoints, subPoints] = [[], []];
   pointsUl.replaceChildren();
 }
@@ -96,7 +101,7 @@ radiusInput.addEventListener("input", (event) => {
   radius = value;
   event.target.setAttribute("value", value);
 
-  clearBtn.click();
+  eraseCirclesBtn.click();
   drawCirclesBtn.click();
 });
 radiusInput.dispatchEvent(new InputEvent("input"));
@@ -112,10 +117,15 @@ function drawCircle(x, y, color) {
   ctx.stroke();
 }
 
-clearBtn.addEventListener("click", () => {
+eraseCirclesBtn.addEventListener("click", () => {
   drawImage(map);
   mainPoints.forEach(({ x, y }) => drawPoint(x, y, "red"));
   subPoints.forEach(({ x, y }) => drawPoint(x, y, "blue"));
+});
+
+clearBtn.addEventListener("click", () => {
+  drawImage(map);
+  initPoints();
 });
 
 equidistanceBtn.addEventListener("click", () => {
@@ -146,5 +156,5 @@ equidistanceBtn.addEventListener("click", () => {
   // console.log(equiPoints);
   // subPoints = [...subPoints, ...equiPoints];
   subPoints.push(equiPoints[0]);
-  clearBtn.click();
+  eraseCirclesBtn.click();
 });
